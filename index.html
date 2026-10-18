@@ -1,0 +1,745 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title> withStudy | Dijital Zamanlayıcı</title>
+
+<style>
+:root {
+  --bg: #101116;
+  --panel: #191b23;
+  --panel2: #22252e;
+  --text: #f5f5fa;
+  --muted: #9295a5;
+  --accent: #ff716d;
+  --glow: #ff716d44;
+  --border: #30333e;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse at 50% 0%, #29232c 0%, transparent 55%),
+    var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+.app {
+  width: 100%;
+  max-width: 1080px;
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  background: #14151b;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 25px 80px #0008;
+}
+
+.sidebar {
+  padding: 30px 18px;
+  background: #17181f;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  margin-bottom: 36px;
+}
+
+.logo span { color: var(--accent); }
+
+.nav {
+  display: grid;
+  gap: 10px;
+}
+
+.nav button {
+  text-align: left;
+  background: transparent;
+  color: var(--muted);
+  padding: 14px 12px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.nav button.active {
+  background: var(--glow);
+  color: var(--accent);
+  border-color: #ff716d33;
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+  padding-top: 36px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.main {
+  padding: 36px;
+  min-width: 0;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.top h1 {
+  font-size: 25px;
+  margin: 0;
+}
+
+.top p {
+  color: var(--muted);
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+
+.status {
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  border-radius: 30px;
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.status::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-right: 7px;
+}
+
+.modes {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 35px 0 25px;
+}
+
+.mode {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--muted);
+  padding: 11px 16px;
+  cursor: pointer;
+}
+
+.mode.active {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--glow);
+}
+
+.clock {
+  text-align: center;
+  padding: 32px 10px 25px;
+  border: 1px solid var(--accent);
+  border-radius: 22px;
+  background: linear-gradient(180deg, #211a20, #17151c);
+  box-shadow: 0 0 35px var(--glow), inset 0 0 35px #ff716d08;
+}
+
+.digits {
+  font-family: "Courier New", monospace;
+  font-size: clamp(54px, 8vw, 94px);
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--accent);
+  text-shadow: 0 0 12px var(--glow), 0 0 35px var(--glow);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.clock-label {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 3px;
+}
+
+.progress {
+  height: 4px;
+  background: #33343e;
+  border-radius: 9px;
+  margin: 25px 0 0;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width .2s linear;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin: 28px 0;
+}
+
+.control {
+  border: 1px solid var(--border);
+  color: var(--text);
+  background: var(--panel2);
+  border-radius: 50%;
+  width: 55px;
+  height: 55px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.control.primary {
+  width: 76px;
+  height: 76px;
+  background: var(--accent);
+  color: #211518;
+  border: none;
+  font-size: 25px;
+  box-shadow: 0 0 30px var(--glow);
+}
+
+.control:hover, .mode:hover {
+  filter: brightness(1.2);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.stat {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 17px 12px;
+  text-align: center;
+}
+
+.stat strong {
+  display: block;
+  font-size: 23px;
+  margin-bottom: 7px;
+}
+
+.stat span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.settings {
+  margin-top: 24px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  padding: 20px;
+}
+
+.settings h3 {
+  font-size: 15px;
+  margin: 0 0 18px;
+}
+
+.setting-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.setting label {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.setting input {
+  width: 100%;
+  padding: 11px;
+  color: var(--text);
+  background: #111218;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  outline: none;
+}
+
+.setting input:focus {
+  border-color: var(--accent);
+}
+
+.apply {
+  margin-top: 16px;
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  border-radius: 9px;
+  padding: 10px 15px;
+  cursor: pointer;
+}
+
+.note {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+  margin-top: 17px;
+}
+
+@media (max-width: 700px) {
+  body { padding: 10px; align-items: flex-start; }
+  .app { grid-template-columns: 1fr; border-radius: 18px; }
+  .sidebar { padding: 18px; border-right: none; border-bottom: 1px solid var(--border); }
+  .logo { margin-bottom: 16px; }
+  .nav { grid-template-columns: repeat(3, 1fr); }
+  .nav button { text-align: center; padding: 12px 5px; font-size: 12px; }
+  .sidebar-bottom { display: none; }
+  .main { padding: 22px 16px; }
+  .top h1 { font-size: 21px; }
+  .status { font-size: 10px; }
+  .modes { gap: 5px; }
+  .mode { padding: 10px 9px; font-size: 12px; }
+  .setting-grid { grid-template-columns: 1fr; }
+  .digits { font-size: clamp(43px, 12vw, 72px); }
+  .stats { gap: 7px; }
+  .stat { padding: 14px 5px; }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo">TIME<span>FLOW</span></div>
+
+    <nav class="nav">
+      <button class="active" data-mode="pomodoro">◉ Pomodoro</button>
+      <button data-mode="stopwatch">◷ Kronometre</button>
+      <button data-mode="countdown">⌛ Geri Sayım</button>
+    </nav>
+
+    <div class="sidebar-bottom">
+      DIGITAL TIME SYSTEM<br>
+      Odaklan. Ölç. Geliş.
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="top">
+      <div>
+        <h1 id="heading">Odaklanma Zamanı</h1>
+        <p id="subtitle">Küçük adımlar, büyük sonuçlar.</p>
+      </div>
+      <div class="status" id="status">Hazır</div>
+    </header>
+
+    <div class="modes" id="pomodoroModes">
+      <button class="mode active" data-phase="focus">Odaklan</button>
+      <button class="mode" data-phase="short">Kısa mola</button>
+      <button class="mode" data-phase="long">Uzun mola</button>
+    </div>
+
+    <section class="clock">
+      <div class="digits" id="display">25:00</div>
+      <div class="clock-label" id="clockLabel">DAKİKA : SANİYE</div>
+      <div class="progress">
+        <div class="progress-bar" id="progress"></div>
+      </div>
+    </section>
+
+    <div class="controls">
+      <button class="control" id="reset" title="Sıfırla">↺</button>
+      <button class="control primary" id="toggle" title="Başlat">▶</button>
+      <button class="control" id="skip" title="Sonraki aşama">↠</button>
+    </div>
+
+    <section class="stats">
+      <div class="stat">
+        <strong id="cycles">0</strong>
+        <span>Tamamlanan odak</span>
+      </div>
+      <div class="stat">
+        <strong id="elapsed">00:00</strong>
+        <span>Toplam çalışma</span>
+      </div>
+      <div class="stat">
+        <strong id="sessions">0</strong>
+        <span>Başlatma sayısı</span>
+      </div>
+    </section>
+
+    <section class="settings" id="settings">
+      <h3>⚙ Süre ayarları</h3>
+      <div class="setting-grid">
+        <div class="setting">
+          <label for="focusMinutes">Odak süresi (dk)</label>
+          <input id="focusMinutes" type="number" min="1" max="180" value="25">
+        </div>
+        <div class="setting">
+          <label for="shortMinutes">Kısa mola (dk)</label>
+          <input id="shortMinutes" type="number" min="1" max="60" value="5">
+        </div>
+        <div class="setting">
+          <label for="longMinutes">Uzun mola (dk)</label>
+          <input id="longMinutes" type="number" min="1" max="120" value="15">
+        </div>
+      </div>
+      <button class="apply" id="apply">Ayarları uygula</button>
+      <p class="note">Varsayılan düzen: 25 dakika odaklanma, 5 dakika kısa mola. Dört odak oturumundan sonra uzun mola verebilirsin.</p>
+    </section>
+  </main>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+const durations = {
+  focus: 25 * 60,
+  short: 5 * 60,
+  long: 15 * 60
+};
+
+const phaseNames = {
+  focus: "Odaklanma Zamanı",
+  short: "Kısa Mola",
+  long: "Uzun Mola"
+};
+
+let mode = "pomodoro";
+let phase = "focus";
+let running = false;
+let startedAt = 0;
+let elapsedMs = 0;
+let countdownStart = 0;
+let countdownDuration = 5 * 60;
+let stopwatchElapsed = 0;
+let timer = null;
+let cycles = 0;
+let sessions = 0;
+let totalFocusSeconds = 0;
+let lastTick = 0;
+let audioContext = null;
+
+function currentSeconds() {
+  if (!running) return elapsedMs / 1000;
+
+  return (elapsedMs + performance.now() - startedAt) / 1000;
+}
+
+function remainingSeconds() {
+  return Math.max(0, countdownDuration - currentSeconds());
+}
+
+function formatTime(value, hundredths = false) {
+  value = Math.max(0, value);
+  const whole = Math.floor(value);
+  const h = Math.floor(whole / 3600);
+  const m = Math.floor((whole % 3600) / 60);
+  const s = whole % 60;
+
+  if (hundredths) {
+    const cs = Math.floor((value % 1) * 100);
+    return h > 0
+      ? `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}.${String(cs).padStart(2,"0")}`
+      : `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}.${String(cs).padStart(2,"0")}`;
+  }
+
+  return h > 0
+    ? `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`
+    : `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+}
+
+function updateDisplay() {
+  let value;
+  let total;
+
+  if (mode === "stopwatch") {
+    value = currentSeconds();
+    total = Math.max(1, value);
+    $("clockLabel").textContent = "SAAT : DAKİKA : SANİYE";
+  } else {
+    value = remainingSeconds();
+    total = countdownDuration;
+    $("clockLabel").textContent = "DAKİKA : SANİYE";
+  }
+
+  $("display").textContent = formatTime(
+    value, mode === "stopwatch"
+  );
+
+  const percent = mode === "stopwatch"
+    ? 0
+    : 100 * (1 - value / Math.max(1, total));
+
+  $("progress").style.width = `${percent}%`;
+  $("toggle").textContent = running ? "Ⅱ" : "▶";
+  $("toggle").title = running ? "Duraklat" : "Başlat";
+  $("status").textContent = running ? "Çalışıyor" : "Hazır";
+  $("cycles").textContent = cycles;
+  $("sessions").textContent = sessions;
+  $("elapsed").textContent = formatTime(totalFocusSeconds);
+}
+
+function stopTimer() {
+  if (running && mode === "pomodoro" && phase === "focus") {
+    totalFocusSeconds += (performance.now() - startedAt) / 1000;
+  }
+
+  running = false;
+  elapsedMs = 0;
+  clearInterval(timer);
+  timer = null;
+  updateDisplay();
+}
+
+function startTimer() {
+  if (running) return;
+
+  if (mode !== "stopwatch" && remainingSeconds() <= 0) {
+    resetTimer();
+  }
+
+  startedAt = performance.now();
+  running = true;
+  sessions++;
+
+  timer = setInterval(tick, 50);
+  updateDisplay();
+}
+
+function pauseTimer() {
+  if (!running) return;
+
+  elapsedMs += performance.now() - startedAt;
+
+  if (mode === "pomodoro" && phase === "focus") {
+    totalFocusSeconds += elapsedMs / 1000;
+  }
+
+  running = false;
+  clearInterval(timer);
+  timer = null;
+  elapsedMs = 0;
+  updateDisplay();
+}
+
+function resetTimer() {
+  const wasRunning = running;
+
+  if (wasRunning) {
+    if (mode === "pomodoro" && phase === "focus") {
+      totalFocusSeconds += (performance.now() - startedAt) / 1000;
+    }
+  }
+
+  running = false;
+  clearInterval(timer);
+  timer = null;
+  elapsedMs = 0;
+  startedAt = 0;
+
+  if (mode === "stopwatch") {
+    countdownDuration = 0;
+  } else if (mode === "countdown") {
+    countdownDuration = 5 * 60;
+  } else {
+    countdownDuration = durations[phase];
+  }
+
+  updateDisplay();
+}
+
+function switchMode(nextMode) {
+  pauseTimer();
+  mode = nextMode;
+
+  document.querySelectorAll(".nav button").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.mode === mode);
+  });
+
+  $("pomodoroModes").style.display =
+    mode === "pomodoro" ? "flex" : "none";
+
+  $("settings").style.display =
+    mode === "pomodoro" ? "block" : "none";
+
+  $("heading").textContent = mode === "stopwatch"
+    ? "Kronometre"
+    : mode === "countdown"
+      ? "Geri Sayım"
+      : phaseNames[phase];
+
+  $("subtitle").textContent = mode === "stopwatch"
+    ? "Geçen zamanı hassas şekilde ölç."
+    : mode === "countdown"
+      ? "Kendi geri sayımını başlat."
+      : "Odaklan, ara ver, devam et.";
+
+  if (mode === "stopwatch") {
+    countdownDuration = 0;
+  } else if (mode === "countdown") {
+    countdownDuration = 5 * 60;
+  } else {
+    countdownDuration = durations[phase];
+  }
+
+  elapsedMs = 0;
+  updateDisplay();
+}
+
+function switchPhase(nextPhase) {
+  pauseTimer();
+  phase = nextPhase;
+  countdownDuration = durations[phase];
+
+  document.querySelectorAll(".mode").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.phase === phase);
+  });
+
+  $("heading").textContent = phaseNames[phase];
+  $("subtitle").textContent = phase === "focus"
+    ? "Küçük adımlar, büyük sonuçlar."
+    : "Kendine kısa bir nefes arası ver.";
+
+  updateDisplay();
+}
+
+function beep() {
+  try {
+    audioContext ??= new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+
+    oscillator.frequency.value = 740;
+    gain.gain.value = 0.08;
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime + 0.25);
+  } catch (e) {
+    // Ses desteklenmiyorsa zamanlayıcı çalışmaya devam eder.
+  }
+}
+
+function tick() {
+  const now = performance.now();
+
+  if (mode === "pomodoro" && phase === "focus") {
+    totalFocusSeconds += (now - lastTick) / 1000;
+  }
+
+  lastTick = now;
+
+  if (mode !== "stopwatch" && remainingSeconds() <= 0) {
+    if (mode === "pomodoro") {
+      beep();
+
+      if (phase === "focus") {
+        cycles++;
+        const next = cycles % 4 === 0 ? "long" : "short";
+        switchPhase(next);
+      } else {
+        switchPhase("focus");
+      }
+      startTimer();
+    } else {
+      elapsedMs = countdownDuration * 1000;
+      running = false;
+      clearInterval(timer);
+      timer = null;
+      beep();
+    }
+  }
+
+  updateDisplay();
+}
+
+$("toggle").addEventListener("click", () => {
+  if (running) pauseTimer();
+  else startTimer();
+});
+
+$("reset").addEventListener("click", resetTimer);
+
+$("skip").addEventListener("click", () => {
+  if (mode === "pomodoro") {
+    if (phase === "focus") {
+      switchPhase(cycles > 0 && cycles % 4 === 0 ? "long" : "short");
+    } else {
+      switchPhase("focus");
+    }
+  } else if (mode === "countdown") {
+    resetTimer();
+  }
+});
+
+document.querySelectorAll(".nav button").forEach(btn => {
+  btn.addEventListener("click", () => switchMode(btn.dataset.mode));
+});
+
+document.querySelectorAll(".mode").forEach(btn => {
+  btn.addEventListener("click", () => switchPhase(btn.dataset.phase));
+});
+
+$("apply").addEventListener("click", () => {
+  const values = {
+    focus: Number($("focusMinutes").value),
+    short: Number($("shortMinutes").value),
+    long: Number($("longMinutes").value)
+  };
+
+  if (Object.values(values).some(
+    n => !Number.isFinite(n) || n < 1 || n > 180
+  )) {
+    alert("Lütfen geçerli süreler gir. Değerler 1–180 dakika arasında olmalı.");
+    return;
+  }
+
+  pauseTimer();
+
+  Object.keys(values).forEach(key => {
+    durations[key] = values[key] * 60;
+  });
+
+  countdownDuration = durations[phase];
+  updateDisplay();
+});
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) updateDisplay();
+});
+
+lastTick = performance.now();
+updateDisplay();
+</script>
+</body>
+</html>
